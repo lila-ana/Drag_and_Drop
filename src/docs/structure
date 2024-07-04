@@ -1,0 +1,7 @@
+/src /controllers - userController.ts - authController.ts ... /entities -
+User.ts - Post.ts ... /middlewares - authMiddleware.ts - errorHandler.ts ...
+/repositories - userRepository.ts - postRepository.ts ... /routes -
+userRoutes.ts - authRoutes.ts ... /services - userService.ts - authService.ts
+... /utils - logger.ts - validator.ts ... /config - database.ts - appConfig.ts
+/tests - user.test.ts - auth.test.ts ... - app.ts - server.ts - tsconfig.json -
+package.json - .env - .gitignore
