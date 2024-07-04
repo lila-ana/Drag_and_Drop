@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { createUserService } from "../services/userService";
 import { CreateUserParams, UpdateUserParams } from "../types/userTypes";
 import AppDataSource from "../config/database";
-import { error } from "console";
 
 const userService = createUserService(AppDataSource.manager);
 
@@ -72,5 +71,22 @@ export async function getAllUsers(req: Request, res: Response) {
     return res.json(users);
   } catch (error) {
     return res.status(500).json({ error: "Failed to get users" });
+  }
+}
+
+export async function login(req: Request, res: Response) {
+  try {
+    const { username, password }: CreateUserParams = req.body;
+    const loginResult = await userService.login({ username, password });
+
+    if (loginResult) {
+      const { user, token } = loginResult;
+      req.session.userId = user.id;
+      return res.json({ user, token });
+    } else {
+      res.status(401).json({ message: "Invalid Credentials" });
+    }
+  } catch (error: any) {
+    return res.status(500).json({ error: "Invalid Username or password" });
   }
 }
