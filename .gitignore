@@ -1,0 +1,33 @@
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# Environment files
+.env
+
+# Build output
+dist/
+build/
+
+# Dependency directories
+bower_components/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+
+# NPM package lock file
+package-lock.json
+
+# TypeScript build artifacts
+*.tsbuildinfo
+
+# Coverage reports
+coverage/

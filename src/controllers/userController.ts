@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { createUserService } from "../services/userService";
 import { CreateUserParams, UpdateUserParams } from "../types/userTypes";
 import AppDataSource from "../config/database";
+import { error } from "console";
 
 const userService = createUserService(AppDataSource.manager);
 
@@ -25,6 +26,7 @@ export async function getUser(req: Request, res: Response) {
     const userId = req.params.id;
     const user = await userService.getUser(userId);
     if (!user) {
+      console.log(res.status(404).json({ error: "User not found" }));
       return res.status(404).json({ error: "User not found" });
     }
     return res.json(user);
