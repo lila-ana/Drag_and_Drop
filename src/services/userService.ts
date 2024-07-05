@@ -7,7 +7,7 @@ import { createBaseRepository } from "../repositories/baseRepository";
 import { CreateUserParams, UpdateUserParams } from "../types/userTypes";
 
 const SALT_ROUNDS = 10;
-const JWT_SECRET = "your_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
 const TOKEN_EXPIRY = "1h";
 
 export function createUserService(entityManager: EntityManager) {
@@ -74,6 +74,6 @@ export function createUserService(entityManager: EntityManager) {
       return null;
     },
 
-    async logout(user: User): Promise<void> {},
+    async logout(userID: String): Promise<void> {},
   };
 }

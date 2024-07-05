@@ -81,12 +81,36 @@ export async function login(req: Request, res: Response) {
 
     if (loginResult) {
       const { user, token } = loginResult;
+      const filteredUser = {
+        id: user.id,
+        username: user.username,
+      };
       req.session.userId = user.id;
-      return res.json({ user, token });
+      return res.json({ user: filteredUser, token });
     } else {
       res.status(401).json({ message: "Invalid Credentials" });
     }
   } catch (error: any) {
     return res.status(500).json({ error: "Invalid Username or password" });
+  }
+}
+
+export async function logout(req: Request, res: Response) {
+  try {
+    const userId = req.session.userId;
+    if (!userId) {
+      return res.status(400).json({ error: "User is not logged in" });
+    }
+
+    await userService.logout(userId);
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Failed to log out" });
+      }
+      res.clearCookie("connect.sid");
+      return res.status(200).json({ message: "Logged out successfully" });
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to log out" });
   }
 }

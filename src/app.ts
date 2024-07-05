@@ -16,7 +16,7 @@ app.use(attachEntityManager); // Custom middleware to attach EntityManager
 
 app.use(
   session({
-    secret: "your_secret_key", // Use a strong secret key in production and store it in an environment variable
+    secret: process.env.SESSION_SECRET || "your_secret_key", // Use a strong secret key in production and store it in an environment variable
     resave: false,
     saveUninitialized: true,
     cookie: {
