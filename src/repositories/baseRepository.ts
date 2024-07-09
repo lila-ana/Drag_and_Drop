@@ -5,8 +5,11 @@ import {
   FindOptionsWhere,
   DeepPartial,
 } from "typeorm";
+import { updateEntity } from "../utils/updateEntity";
 
-export function createBaseRepository<T extends { id: string }>(
+type EntityWithOptionalId = { id?: string };
+
+export function createBaseRepository<T extends EntityWithOptionalId>(
   entityManager: EntityManager,
   entity: EntityTarget<T>
 ) {
@@ -23,6 +26,10 @@ export function createBaseRepository<T extends { id: string }>(
       return entityManager.findOne(entity, options);
     },
 
+    async findOneBy(where: FindOptionsWhere<T>): Promise<T | null> {
+      return entityManager.findOne(entity, { where });
+    },
+
     async update(id: string, data: Partial<T>): Promise<T | null> {
       const entityInstance = await this.findOne(id);
 
@@ -33,6 +40,13 @@ export function createBaseRepository<T extends { id: string }>(
       return entityManager.save(entity, entityInstance);
     },
 
+    async customUpdate(id: string, updates: Partial<T>): Promise<T | null> {
+      return updateEntity(
+        () => this.findOne(id),
+        (entity) => entityManager.save(entity),
+        updates
+      );
+    },
     async delete(id: string): Promise<boolean> {
       const result = await entityManager.delete(entity, id);
       return result.affected !== 0;

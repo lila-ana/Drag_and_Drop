@@ -11,7 +11,7 @@ interface AppConfig {
 
 const config: AppConfig = {
   port: parseInt(process.env.PORT || "3000", 10),
-  jwtSecret: process.env.JWT_SECRET || "your_jwt_secret",
+  jwtSecret: process.env.JWT_SECRET || "ThisIsASampleSeCretTok3n",
   nodeEnv: process.env.NODE_ENV || "development",
   apiBaseUrl: process.env.API_BASE_URL || "http://localhost:3000/api",
 };

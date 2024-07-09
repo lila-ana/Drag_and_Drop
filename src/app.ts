@@ -2,8 +2,7 @@ import express, { Application } from "express";
 import session from "express-session";
 
 import { attachEntityManager } from "./middlewares/attachEntityManager";
-
-import userRoutes from "./routes/v1/userRoutes";
+import routes from "./routes/v1";
 import { notFoundHandler } from "./middlewares/notFoundHandler";
 import { errorHandler } from "./middlewares/errorHandler";
 
@@ -26,7 +25,7 @@ app.use(
 );
 
 // Routes
-app.use("/api", userRoutes);
+app.use("/api", routes);
 
 // =============> Error handling middleware <===========
 

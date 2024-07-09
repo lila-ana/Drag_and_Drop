@@ -15,13 +15,14 @@ export function createUserService(entityManager: EntityManager) {
 
   return {
     async createUser(params: CreateUserParams): Promise<User> {
-      const { username, password } = params;
+      const { username, password, email } = params;
 
       const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
       return userRepository.create({
         username,
         password: hashedPassword,
+        email,
       } as DeepPartial<User>);
     },
 
@@ -29,21 +30,41 @@ export function createUserService(entityManager: EntityManager) {
       return userRepository.findOne(id);
     },
 
-    async updateUser(params: UpdateUserParams): Promise<User | null> {
-      const { id, username, password } = params;
-      const user = await userRepository.findOne(id);
-      if (!user) {
-        return null;
-      }
+    async getUserByUsername(username: string): Promise<User | null> {
+      return userRepository.findOneBy({ username });
+    },
 
-      if (username) {
-        user.username = username;
-      }
+    async getUserByEmail(email: string): Promise<User | null> {
+      return userRepository.findOneBy({ email });
+    },
+
+    // async updateUser(params: UpdateUserParams): Promise<User | null> {
+    //   const { id, username, password } = params;
+    //   const user = await userRepository.findOne(id);
+    //   if (!user) {
+    //     return null;
+    //   }
+
+    //   if (username) {
+    //     user.username = username;
+    //   }
+
+    //   if (password) {
+    //     user.password = await bcrypt.hash(password, SALT_ROUNDS);
+    //   }
+    //   return userRepository.update(id, user as Partial<User>);
+    // },
+
+    async updateUser(params: UpdateUserParams): Promise<User | null> {
+      const { id, username, password, email } = params;
+
+      const updates: Partial<User> = { username, password, email };
 
       if (password) {
-        user.password = await bcrypt.hash(password, SALT_ROUNDS);
+        updates.password = await bcrypt.hash(password, SALT_ROUNDS);
       }
-      return userRepository.update(id, user as Partial<User>);
+
+      return userRepository.customUpdate(id, updates);
     },
 
     async deleteUser(id: string): Promise<boolean> {
@@ -61,10 +82,10 @@ export function createUserService(entityManager: EntityManager) {
     async login(
       params: CreateUserParams
     ): Promise<{ user: User; token: string } | null> {
-      const { username, password } = params;
+      const { email, password } = params;
 
       const users = await userRepository.findAll();
-      const user = users.find((user) => user.username === username);
+      const user = users.find((user) => user.email === email);
       if (user && (await this.verifyPassword(user, password))) {
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
           expiresIn: TOKEN_EXPIRY,

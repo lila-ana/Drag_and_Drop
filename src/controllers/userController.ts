@@ -7,13 +7,16 @@ const userService = createUserService(AppDataSource.manager);
 
 export async function createUser(req: Request, res: Response) {
   try {
-    const { username, password }: CreateUserParams = req.body;
-    if (!username || !password) {
-      return res
-        .status(400)
-        .json({ error: "Username and password are required" });
+    const { username, password, email }: CreateUserParams = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
     }
-    const user = await userService.createUser({ username, password });
+
+    const existingUser = await userService.getUserByEmail(email);
+    if (existingUser) {
+      return res.status(409).json({ error: "Email already exists" });
+    }
+    const user = await userService.createUser({ username, password, email });
     return res.status(201).json(user);
   } catch (error) {
     return res.status(500).json({ error: "Failed to create user" });
@@ -37,11 +40,13 @@ export async function getUser(req: Request, res: Response) {
 export async function updateUser(req: Request, res: Response) {
   try {
     const userId = req.params.id;
-    const { username, password }: UpdateUserParams = req.body;
+    const { username, password, email }: UpdateUserParams = req.body;
+
     const user = await userService.updateUser({
       id: userId,
       username,
       password,
+      email,
     });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -76,14 +81,14 @@ export async function getAllUsers(req: Request, res: Response) {
 
 export async function login(req: Request, res: Response) {
   try {
-    const { username, password }: CreateUserParams = req.body;
-    const loginResult = await userService.login({ username, password });
+    const { username, password, email }: CreateUserParams = req.body;
+    const loginResult = await userService.login({ username, password, email });
 
     if (loginResult) {
       const { user, token } = loginResult;
       const filteredUser = {
         id: user.id,
-        username: user.username,
+        email: user.email,
       };
       req.session.userId = user.id;
       return res.json({ user: filteredUser, token });

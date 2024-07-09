@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
-import { v4 as uuidv4 } from "uuid";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
 export class User {
@@ -9,11 +8,9 @@ export class User {
   @Column()
   username!: string;
 
+  @Column({ nullable: true })
+  email!: string;
+
   @Column()
   password!: string;
-
-  @BeforeInsert()
-  generateId() {
-    this.id = uuidv4();
-  }
 }
